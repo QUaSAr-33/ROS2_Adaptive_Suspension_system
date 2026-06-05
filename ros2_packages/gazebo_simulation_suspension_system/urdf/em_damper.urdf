@@ -1,0 +1,646 @@
+<?xml version="1.0"?>
+<robot name="em_damper">
+
+  <!--
+  ═══════════════════════════════════════════════════════════════════
+  ELECTROMAGNETIC OIL DAMPER — Piston-Cylinder Assembly
+  ═══════════════════════════════════════════════════════════════════
+
+  Geometry (realistic scale):
+    Outer cylinder body : radius=0.032m  length=0.280m  (aluminium housing)
+    Inner cylinder bore : radius=0.025m  (oil chamber)
+    Piston rod          : radius=0.010m  length=0.320m  (hardened steel)
+    Piston head         : radius=0.024m  thickness=0.018m
+    Solenoid coil       : 8 rings, radius=0.042m→0.058m (copper winding)
+    Top mount           : radius=0.018m  length=0.040m  (eye-bolt)
+    Bottom mount        : radius=0.018m  length=0.040m  (eye-bolt)
+
+  Colour scheme (realistic metals):
+    Cylinder body  : dark anodised aluminium  #2C3E50  (dark slate)
+    Piston rod     : polished chrome steel     #BDC3C7
+    Piston head    : machined steel            #7F8C8D
+    Solenoid coil  : copper winding            #B87333
+    Coil former    : black ABS bobbin          #1A1A2E
+    End caps       : brushed aluminium         #85929E
+    Mount eyes     : zinc-plated steel         #AAB7B8
+    Oil seal       : black rubber              #1C1C1C
+  ═══════════════════════════════════════════════════════════════════
+  -->
+
+  <!-- ════════════════════════════════════════════════════════════
+       MATERIALS
+  ════════════════════════════════════════════════════════════════ -->
+
+  <material name="anodised_aluminium">
+    <color rgba="0.173 0.243 0.314 1.0"/>
+  </material>
+  <material name="chrome_steel">
+    <color rgba="0.741 0.765 0.780 1.0"/>
+  </material>
+  <material name="machined_steel">
+    <color rgba="0.498 0.549 0.553 1.0"/>
+  </material>
+  <material name="copper_winding">
+    <color rgba="0.722 0.451 0.200 1.0"/>
+  </material>
+  <material name="black_bobbin">
+    <color rgba="0.102 0.102 0.118 1.0"/>
+  </material>
+  <material name="brushed_aluminium">
+    <color rgba="0.522 0.573 0.619 1.0"/>
+  </material>
+  <material name="zinc_steel">
+    <color rgba="0.667 0.718 0.722 1.0"/>
+  </material>
+  <material name="rubber_seal">
+    <color rgba="0.110 0.110 0.110 1.0"/>
+  </material>
+  <material name="oil_amber">
+    <color rgba="0.600 0.380 0.050 0.55"/>
+  </material>
+  <material name="red_indicator">
+    <color rgba="0.9 0.1 0.1 1.0"/>
+  </material>
+  <material name="green_indicator">
+    <color rgba="0.1 0.85 0.2 1.0"/>
+  </material>
+
+  <!-- ════════════════════════════════════════════════════════════
+       WORLD FIXED BASE (anchor point)
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="world"/>
+
+  <!-- Fixed top support joint -->
+  <joint name="world_to_top_mount" type="fixed">
+    <parent link="world"/>
+    <child link="top_mount"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       TOP MOUNT — upper eye-bolt / clevis (fixed to world)
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="top_mount">
+    <inertial>
+      <mass value="0.15"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+
+    <!-- Main eye body -->
+    <visual name="eye_body">
+      <origin xyz="0 0 0.020" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.018" length="0.040"/></geometry>
+      <material name="zinc_steel"/>
+    </visual>
+    <!-- Eye ring -->
+    <visual name="eye_ring_outer">
+      <origin xyz="0 0 0.052" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.014" length="0.008"/></geometry>
+      <material name="zinc_steel"/>
+    </visual>
+    <!-- Mounting bolt head -->
+    <visual name="bolt_head">
+      <origin xyz="0 0 -0.005" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.022" length="0.010"/></geometry>
+      <material name="brushed_aluminium"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 0.020" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.022" length="0.060"/></geometry>
+    </collision>
+  </link>
+
+  <!-- ════════════════════════════════════════════════════════════
+       TOP END CAP — closes upper cylinder (brushed aluminium)
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="top_cap">
+    <inertial>
+      <mass value="0.12"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+
+    <!-- Cap disc -->
+    <visual name="cap_disc">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.034" length="0.016"/></geometry>
+      <material name="brushed_aluminium"/>
+    </visual>
+    <!-- Rod seal groove -->
+    <visual name="seal_groove">
+      <origin xyz="0 0 0.004" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.012" length="0.008"/></geometry>
+      <material name="rubber_seal"/>
+    </visual>
+    <!-- Cap bolts (4x decorative) -->
+    <visual name="bolt_1">
+      <origin xyz="0.026 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_2">
+      <origin xyz="-0.026 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_3">
+      <origin xyz="0 0.026 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_4">
+      <origin xyz="0 -0.026 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+
+    <collision>
+      <geometry><cylinder radius="0.034" length="0.016"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="mount_to_top_cap" type="fixed">
+    <parent link="top_mount"/>
+    <child link="top_cap"/>
+    <origin xyz="0 0 -0.048" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       CYLINDER BODY — main outer housing (anodised aluminium)
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="cylinder_body">
+    <inertial>
+      <mass value="0.85"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.0008"/>
+    </inertial>
+
+    <!-- Main tube -->
+    <visual name="outer_tube">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.032" length="0.280"/></geometry>
+      <material name="anodised_aluminium"/>
+    </visual>
+
+    <!-- Knurled grip ring at top -->
+    <visual name="grip_ring_top">
+      <origin xyz="0 0 0.100" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0335" length="0.018"/></geometry>
+      <material name="machined_steel"/>
+    </visual>
+
+    <!-- Knurled grip ring at bottom -->
+    <visual name="grip_ring_bottom">
+      <origin xyz="0 0 -0.100" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0335" length="0.018"/></geometry>
+      <material name="machined_steel"/>
+    </visual>
+
+    <!-- Oil fill port -->
+    <visual name="fill_port">
+      <origin xyz="0.032 0 -0.060" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.005" length="0.010"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+
+    <!-- Bleed nipple -->
+    <visual name="bleed_nipple">
+      <origin xyz="0.032 0 0.060" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.004" length="0.008"/></geometry>
+      <material name="zinc_steel"/>
+    </visual>
+
+    <collision>
+      <geometry><cylinder radius="0.034" length="0.280"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="top_cap_to_cylinder" type="fixed">
+    <parent link="top_cap"/>
+    <child link="cylinder_body"/>
+    <origin xyz="0 0 -0.148" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       SOLENOID COIL FORMER (black ABS bobbin — fixed to cylinder)
+       8 coil sections stacked vertically
+  ════════════════════════════════════════════════════════════════ -->
+
+  <!-- Coil former tube -->
+  <link name="coil_former">
+    <inertial>
+      <mass value="0.08"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual name="former_tube">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0365" length="0.240"/></geometry>
+      <material name="black_bobbin"/>
+    </visual>
+    <!-- Top flange -->
+    <visual name="flange_top">
+      <origin xyz="0 0 0.122" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.058" length="0.004"/></geometry>
+      <material name="black_bobbin"/>
+    </visual>
+    <!-- Bottom flange -->
+    <visual name="flange_bottom">
+      <origin xyz="0 0 -0.122" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.058" length="0.004"/></geometry>
+      <material name="black_bobbin"/>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="0.058" length="0.248"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="cylinder_to_former" type="fixed">
+    <parent link="cylinder_body"/>
+    <child link="coil_former"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Coil winding layer 1 (bottom) -->
+  <link name="coil_layer_1">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.048" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil1" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_1"/>
+    <origin xyz="0 0 -0.105" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_2">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.052" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil2" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_2"/>
+    <origin xyz="0 0 -0.075" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_3">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.048" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil3" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_3"/>
+    <origin xyz="0 0 -0.045" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_4">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.053" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil4" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_4"/>
+    <origin xyz="0 0 -0.015" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_5">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.049" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil5" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_5"/>
+    <origin xyz="0 0 0.015" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_6">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.052" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil6" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_6"/>
+    <origin xyz="0 0 0.045" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_7">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.050" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil7" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_7"/>
+    <origin xyz="0 0 0.075" rpy="0 0 0"/>
+  </joint>
+
+  <link name="coil_layer_8">
+    <inertial><mass value="0.04"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="0.048" length="0.026"/></geometry>
+      <material name="copper_winding"/>
+    </visual>
+    <collision><geometry><cylinder radius="0.056" length="0.026"/></geometry></collision>
+  </link>
+  <joint name="former_to_coil8" type="fixed">
+    <parent link="coil_former"/>
+    <child link="coil_layer_8"/>
+    <origin xyz="0 0 0.105" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Lead wires coming off coil -->
+  <link name="lead_wire_positive">
+    <inertial><mass value="0.005"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.002" length="0.035"/></geometry>
+      <material name="red_indicator"/>
+    </visual>
+  </link>
+  <joint name="coil_to_lead_pos" type="fixed">
+    <parent link="coil_former"/>
+    <child link="lead_wire_positive"/>
+    <origin xyz="0.058 0 0.110" rpy="0 0 0"/>
+  </joint>
+
+  <link name="lead_wire_negative">
+    <inertial><mass value="0.005"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.002" length="0.035"/></geometry>
+      <material name="black_bobbin"/>
+    </visual>
+  </link>
+  <joint name="coil_to_lead_neg" type="fixed">
+    <parent link="coil_former"/>
+    <child link="lead_wire_negative"/>
+    <origin xyz="-0.058 0 0.110" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       PISTON ROD — the moving part (prismatic joint)
+       Travels ±0.090m inside the cylinder
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="piston_rod">
+    <inertial>
+      <mass value="0.35"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0008" ixy="0" ixz="0" iyy="0.0008" iyz="0" izz="0.00002"/>
+    </inertial>
+
+    <!-- Chrome rod shaft -->
+    <visual name="rod_shaft">
+      <origin xyz="0 0 -0.100" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.010" length="0.200"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+
+    <!-- Piston head (inside cylinder — slightly translucent to show position) -->
+    <visual name="piston_head">
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0235" length="0.018"/></geometry>
+      <material name="machined_steel"/>
+    </visual>
+
+    <!-- Piston head chamfer ring -->
+    <visual name="piston_chamfer">
+      <origin xyz="0 0 0.001" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0240" length="0.004"/></geometry>
+      <material name="rubber_seal"/>
+    </visual>
+
+    <!-- Oil seal wiper on rod -->
+    <visual name="rod_wiper">
+      <origin xyz="0 0 0.022" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.013" length="0.006"/></geometry>
+      <material name="rubber_seal"/>
+    </visual>
+
+    <!-- Bottom rod end (clevis pin hole area) -->
+    <visual name="rod_end_cap">
+      <origin xyz="0 0 -0.202" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.012" length="0.006"/></geometry>
+      <material name="machined_steel"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 -0.090" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.0240" length="0.220"/></geometry>
+    </collision>
+  </link>
+
+  <!-- Prismatic joint — allows piston to travel vertically inside cylinder -->
+  <joint name="piston_travel" type="prismatic">
+    <parent link="cylinder_body"/>
+    <child link="piston_rod"/>
+    <origin xyz="0 0 0.140" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-0.090" upper="0.090" effort="2000.0" velocity="0.5"/>
+    <!-- Variable damping — controlled by PID/current -->
+    <dynamics damping="800.0" friction="15.0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       BOTTOM MOUNT — lower eye-bolt attached to piston rod
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="bottom_mount">
+    <inertial>
+      <mass value="0.12"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <!-- Eye body -->
+    <visual name="eye_body">
+      <origin xyz="0 0 -0.020" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.018" length="0.040"/></geometry>
+      <material name="zinc_steel"/>
+    </visual>
+    <!-- Eye ring -->
+    <visual name="eye_ring">
+      <origin xyz="0 0 -0.052" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.014" length="0.008"/></geometry>
+      <material name="zinc_steel"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -0.030" rpy="0 0 0"/>
+      <geometry><cylinder radius="0.022" length="0.060"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="rod_to_bottom_mount" type="fixed">
+    <parent link="piston_rod"/>
+    <child link="bottom_mount"/>
+    <origin xyz="0 0 -0.205" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       BOTTOM END CAP — lower cylinder closure
+  ════════════════════════════════════════════════════════════════ -->
+  <link name="bottom_cap">
+    <inertial>
+      <mass value="0.12"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+    </inertial>
+    <visual name="cap_disc">
+      <geometry><cylinder radius="0.034" length="0.016"/></geometry>
+      <material name="brushed_aluminium"/>
+    </visual>
+    <visual name="bolt_1">
+      <origin xyz="0.026 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_2">
+      <origin xyz="-0.026 0 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_3">
+      <origin xyz="0 0.026 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <visual name="bolt_4">
+      <origin xyz="0 -0.026 0"/>
+      <geometry><cylinder radius="0.003" length="0.018"/></geometry>
+      <material name="chrome_steel"/>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="0.034" length="0.016"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="cylinder_to_bottom_cap" type="fixed">
+    <parent link="cylinder_body"/>
+    <child link="bottom_cap"/>
+    <origin xyz="0 0 -0.148" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ════════════════════════════════════════════════════════════
+       GAZEBO MATERIAL OVERRIDES (higher quality rendering)
+  ════════════════════════════════════════════════════════════════ -->
+
+  <gazebo reference="cylinder_body">
+    <material>Gazebo/DarkGrey</material>
+    <mu1>0.8</mu1><mu2>0.8</mu2>
+  </gazebo>
+
+  <gazebo reference="piston_rod">
+    <material>Gazebo/WhiteGlow</material>
+    <mu1>0.3</mu1><mu2>0.3</mu2>
+  </gazebo>
+
+  <gazebo reference="coil_former">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="coil_layer_1">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_2">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_3">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_4">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_5">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_6">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_7">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+  <gazebo reference="coil_layer_8">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <gazebo reference="top_cap">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="bottom_cap">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  <gazebo reference="top_mount">
+    <material>Gazebo/ZincYellow</material>
+  </gazebo>
+  <gazebo reference="bottom_mount">
+    <material>Gazebo/ZincYellow</material>
+  </gazebo>
+  <gazebo reference="lead_wire_positive">
+    <material>Gazebo/RedGlow</material>
+  </gazebo>
+
+  <!-- Joint state publisher plugin -->
+  <gazebo>
+    <plugin name="joint_state_pub" filename="libgazebo_ros_joint_state_publisher.so">
+      <ros>
+        <namespace>/damper</namespace>
+        <remapping>~/out:=joint_states</remapping>
+      </ros>
+      <update_rate>100</update_rate>
+      <joint_name>piston_travel</joint_name>
+    </plugin>
+  </gazebo>
+
+  <!-- Joint effort controller plugin -->
+  <gazebo>
+    <plugin name="joint_effort_ctrl" filename="libgazebo_ros_joint_pose_trajectory.so">
+      <ros><namespace>/damper</namespace></ros>
+    </plugin>
+  </gazebo>
+
+</robot>

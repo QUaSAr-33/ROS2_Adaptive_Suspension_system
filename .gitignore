@@ -1,0 +1,39 @@
+# ROS2
+build/
+install/
+log/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# VSCode
+.vscode/
+
+# Linux
+*.swp
+*.swo
+
+# ROS2 generated
+*.egg-info/
+
+# Temporary
+tmp/
+temp/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Large recordings
+*.bag
+
+# Cache
+.cache/
+
+# MATLAB autosaves
+*.asv
+*.autosave
+
+# ROS logs
+*.log
