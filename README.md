@@ -163,10 +163,10 @@ Key capabilities include:
 
 ## Author
 
-Azlan Ahmad Shah
-Mohammad Ibrahim Malik
-Muzammil Ahmed Wani
-Basit Bashir
+Azlan Ahmad Shah,
+Mohammad Ibrahim Malik,
+Muzammil Ahmed Wani,
+Basit Bashir.
 
 Department of Mechanical Engineering
 
